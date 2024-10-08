@@ -1,0 +1,148 @@
+<div class="mt-4">
+  <form [formGroup]="movieForm" (ngSubmit)="addMovie()" class="bg-white p-4 rounded-lg shadow-md space-y-4 transition-transform duration-300 ease-in-out">
+    <input
+      formControlName="title"
+      placeholder="Film Adı"
+      class="border border-gray-300 rounded p-2 w-full focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
+    />
+    
+    <select formControlName="genre" class="border border-gray-300 rounded p-2 w-full focus:border-blue-500 focus:ring-2 focus:ring-blue-500">
+      <option value="" disabled selected>Tür Seç</option>
+      <option value="Drama">Drama</option>
+      <option value="Komedi">Komedi</option>
+      <option value="Bilim Kurgu">Bilim Kurgu</option>
+    </select>
+
+    <input
+      formControlName="rating"
+      type="number"
+      min="1"
+      max="10"
+      placeholder="Derecelendirme (1-10)"
+      class="border border-gray-300 rounded p-2 w-full focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
+    />
+
+    <select formControlName="year" class="border border-gray-300 rounded p-2 w-full focus:border-blue-500 focus:ring-2 focus:ring-blue-500">
+      <option value="" disabled selected>Yıl Seç</option>
+      <option value="2021">2021</option>
+      <option value="2020">2020</option>
+      <option value="2019">2019</option>
+    </select>
+
+    <button
+      type="submit"
+      class="w-full p-2 bg-blue-500 text-white rounded-lg font-bold hover:bg-blue-600 transition-colors duration-300"
+    >
+      Ekle
+    </button>
+  </form>
+
+
+  <div *ngIf="errorMessage" class="text-red-500 mt-2 animate-bounce">
+    {{ errorMessage }}
+  </div>
+</div>
+
+
+<div class="mt-4">
+  <form [formGroup]="filterForm" (ngSubmit)="onFilter()" class="bg-white p-4 rounded-lg shadow-md space-y-4">
+    <input
+      formControlName="search"
+      placeholder="Aradığınız Filmin Adı"
+      class="border border-gray-300 rounded p-2 w-full focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
+    />
+    <select formControlName="genre" class="border border-gray-300 rounded p-2 w-full focus:border-blue-500 focus:ring-2 focus:ring-blue-500">
+      <option value="">Tür (Hepsi)</option>
+      <option value="Drama">Drama</option>
+      <option value="Komedi">Komedi</option>
+      <option value="Bilim Kurgu">Bilim Kurgu</option>
+    </select>
+    
+    <select formControlName="rating" class="border border-gray-300 rounded p-2 w-full focus:border-blue-500 focus:ring-2 focus:ring-blue-500">
+      <option value="">Derecelendirme (Hepsi)</option>
+      <option value="9">9+</option>
+      <option value="8">8+</option>
+      <option value="7">7+</option>
+    </select>
+
+    <select formControlName="year" class="border border-gray-300 rounded p-2 w-full focus:border-blue-500 focus:ring-2 focus:ring-blue-500">
+      <option value="">Yıl (Hepsi)</option>
+      <option value="2021">2021</option>
+      <option value="2020">2020</option>
+      <option value="2019">2019</option>
+    </select>
+
+    <button
+      type="submit"
+      class="w-full p-2 bg-blue-500 text-white rounded-lg font-bold hover:bg-blue-600 transition-colors duration-300"
+    >
+      Filtrele
+    </button>
+  </form>
+</div>
+
+
+<div class="overflow-x-auto"> <!-- Tabloyu saran div -->
+  <table class="mt-6 w-full table-auto border-collapse border border-gray-400 shadow-lg rounded-lg overflow-hidden">
+    <thead class="bg-blue-500 text-white">
+      <tr>
+        <th class="border border-gray-400 p-2 md:p-3 text-left w-1/4">Film Adı</th>
+        <th class="border border-gray-400 p-2 md:p-3 text-left w-1/6">Tür</th>
+        <th class="border border-gray-400 p-2 md:p-3 text-left w-1/6">Derecelendirme</th>
+        <th class="border border-gray-400 p-2 md:p-3 text-left w-1/6">Yıl</th>
+        <th class="border border-gray-400 p-2 md:p-3 text-center w-1/6">İşlem</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let movie of filteredMovies" class="bg-white">
+        <ng-container *ngIf="!movie.editing">
+          <td class="border border-gray-400 p-2 md:p-3 text-left truncate max-w-xs overflow-hidden text-ellipsis whitespace-nowrap">{{ movie.title }}</td>
+          <td class="border border-gray-400 p-2 md:p-3 text-left">{{ movie.genre }}</td>
+          <td class="border border-gray-400 p-2 md:p-3 text-left">{{ movie.rating }}</td>
+          <td class="border border-gray-400 p-2 md:p-3 text-left">{{ movie.year }}</td>
+          <td class="border border-gray-400 p-2 md:p-3 text-center">
+            <div class="flex justify-center space-x-2 md:space-x-4">
+              <button (click)="deleteMovie(movie.id)" class="bg-red-500 text-white px-2 md:px-4 py-1 md:py-2 rounded hover:bg-red-700 font-bold transition-colors duration-300">
+                Sil
+              </button>
+              <button (click)="editMovie(movie)" class="bg-blue-500 text-white px-2 md:px-4 py-1 md:py-2 rounded hover:bg-blue-700 font-bold transition-colors duration-300">
+                Düzenle
+              </button>
+            </div>
+          </td>
+        </ng-container>
+
+        <ng-container *ngIf="movie.editing">
+          <td class="border border-gray-400 p-2 md:p-3 text-left">
+            <input [(ngModel)]="movie.title" class="border border-gray-300 rounded p-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500" />
+          </td>
+          <td class="border border-gray-400 p-2 md:p-3 text-left">
+            <select [(ngModel)]="movie.genre" class="border border-gray-300 rounded p-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <option value="" disabled selected>Tür Seç</option>
+              <option value="Drama">Drama</option>
+              <option value="Komedi">Komedi</option>
+              <option value="Bilim Kurgu">Bilim Kurgu</option>
+            </select>
+          </td>
+          <td class="border border-gray-400 p-2 md:p-3 text-left">
+            <input [(ngModel)]="movie.rating" type="number" min="1" max="10" class="border border-gray-300 rounded p-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500" />
+          </td>
+          <td class="border border-gray-400 p-2 md:p-3 text-left">
+            <select [(ngModel)]="movie.year" class="border border-gray-300 rounded p-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <option value="2021">2021</option>
+              <option value="2020">2020</option>
+              <option value="2019">2019</option>
+            </select>
+          </td>
+          <td class="border border-gray-400 p-2 md:p-3 text-center">
+            <button (click)="updateMovie(movie)" class="text-green-500 hover:text-green-700 font-bold transition-colors duration-300">
+              Kaydet
+            </button>
+          </td>
+        </ng-container>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+
